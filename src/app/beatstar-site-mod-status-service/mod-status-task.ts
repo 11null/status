@@ -43,7 +43,7 @@ export class ModStatusTask {
             if (data.rootStatus==data.versionStatus&& data.versionStatus==data.scriptStatus&& data.scriptStatus=="ok") {
                 prog.description = "Connection successful, server is UP.";
                 if (data.lastOnline!=null && data.lastOnline>0) prog.fakeCommandText = "Last successful connection "+Math.round(data.lastOnline/1000)+" sec. ago."
-                prog.fakeCommandText = "Connected OK."
+                else prog.fakeCommandText = "Connected OK."
                 this.status = Status.S;
                 this.progress.next(prog)
             } else {
