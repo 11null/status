@@ -1,0 +1,175 @@
+<mat-toolbar [color]='toolbarColor()'>
+    <button *ngIf="false" mat-icon-button class="menu-icon" aria-label="button with menu icon">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <mat-icon>bar_chart</mat-icon>
+    <span>Mod Status</span>
+    <span class="example-spacer"></span>
+    <!--
+        <button mat-button>Home</button>
+        <button mat-button>Status</button>
+        <button mat-button>Mod Settings</button>
+        <button mat-button>Old site</button>
+    -->
+    <span class="example-spacer"></span>
+    <span *ngIf="status==Status.S">Server UP</span>
+    <span *ngIf="status==Status.E">Server DOWN</span>
+      &nbsp;
+    <mat-icon *ngIf="status==Status.W" class="warning-icon" aria-hidden="false"
+        aria-label="Warning icon">warning</mat-icon>
+    <mat-icon *ngIf="status==Status.E" class="error-icon" aria-hidden="false" aria-label="Error icon">error</mat-icon>
+    <mat-icon *ngIf="status==Status.S" class="success-icon" aria-hidden="false"
+        aria-label="Success icon">check_circle</mat-icon>
+    <mat-icon *ngIf="status==Status.L" class="loading-icon" aria-hidden="false"
+        aria-label="Loading icon">pending</mat-icon>
+</mat-toolbar>
+<div [style.backgroundColor]="'#b0bec5'" [style.maxWidth]="'100%'" class="top-container">
+    <mat-card>
+        <mat-card-header>
+            <h5>STATUS</h5>
+        </mat-card-header>
+        <mat-card-content>
+            <h3>{{progressDescription}}</h3>
+            
+        </mat-card-content>
+        <mat-card-actions><mat-progress-bar *ngIf="status==Status.L" mode="indeterminate"></mat-progress-bar></mat-card-actions>
+        <mat-card-actions>
+            <button mat-stroked-button [disabled]="status==Status.L" (click)="startCheck()">Check status</button>
+        </mat-card-actions>
+    </mat-card>
+    <mat-card>
+        <mat-card-header>
+            <h5>PROGRESS</h5>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-card>
+                <mat-card-content [style.backgroundColor]="'#111'">
+                    <pre>{{progressText.slice(0,progressTextInd)}}{{cursor}}</pre>
+                    
+                </mat-card-content>
+            </mat-card>
+        </mat-card-content>
+    </mat-card>
+    <mat-card>
+        <mat-card-header>
+            <h5>DETAIL</h5>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-accordion>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Check server
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            {{ status==Status.L?"Checking...":""}}
+                            {{ status==Status.S?task?.response?.rootStatus:""}}
+                            {{ status==Status.E?"Error, open for details":""}}
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <p *ngIf="status==Status.S">Response length: {{ task?.response?.rootRes?.size || ""}}</p>
+                    <p *ngIf="status==Status.S">Response preview: </p>
+                    <pre *ngIf="status==Status.S">{{ task?.response?.rootRes?.preview || ""}}</pre>
+                    <p *ngIf="status==Status.L">Please hold on...</p>
+                    <p *ngIf="status==Status.E">{{ status==Status.E?task?.response?.rootError:""}}</p>
+                </mat-expansion-panel>
+                
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Version
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            {{ status==Status.L?"Checking...":""}}
+                            {{ status==Status.S?task?.response?.versionRes:""}}
+                            {{ status==Status.E?"Error, open for details":""}}
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <p *ngIf="status==Status.S">Server provided version: {{ task?.response?.versionRes || ""}}</p>
+                    <p *ngIf="status==Status.L">Please hold on...</p>
+                    <p *ngIf="status==Status.E">{{ status==Status.E?task?.response?.versionError:""}}</p>
+                </mat-expansion-panel>
+                
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Script
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            {{ status==Status.L?"Checking...":""}}
+                            {{ status==Status.S?task?.response?.scriptStatus:""}}
+                            {{ status==Status.E?"Error, open for details":""}}
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <p *ngIf="status==Status.S">Script size: {{ task?.response?.scriptRes?.size/1000 || ""}} KB</p>
+                    <p *ngIf="status==Status.S">Content preview: </p>
+                    <pre *ngIf="status==Status.S">{{ task?.response?.scriptRes?.preview || ""}}</pre>
+                    <p *ngIf="status==Status.L">Please hold on...</p>
+                    <p *ngIf="status==Status.E">{{ status==Status.E?task?.response?.scriptError:""}}</p>
+                </mat-expansion-panel>
+            </mat-accordion>
+
+        </mat-card-content>
+    </mat-card>
+    <mat-card>
+        <mat-card-header>
+            <h5>INFO</h5>
+        </mat-card-header>
+        <mat-card-content>
+            <p>Read the following to understand this page</p>
+            <mat-accordion>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Mod status
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            Open to read about what is mod status.
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <p><b>Mod status</b> checks if mod server is working. <b>Mod server</b> is used to download latest version of the mod script and to save your scores.</p>
+                </mat-expansion-panel>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Mod down
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            What happens if mod is DOWN?
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <p>When MOD is down, your mod will not be updated. If you already have a good version then you will be able to play the mod but <b>scores will not be saved</b>. </p>
+                </mat-expansion-panel>
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Mod up
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            What happens if mod is UP?
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <p>When MOD is up, everything should work fine. If it's not working it could be a device issue or bad configuration. Visit discord for support.
+                </mat-expansion-panel>
+            </mat-accordion>
+        </mat-card-content>
+    </mat-card>
+    <div [style.height]="'12em'"></div>
+    <mat-card>
+        <mat-card-content>
+            <div class="buttons">
+                <a mat-stroked-button href="https://beatstar.glitch.me/" target="_blank" matTooltip="Old site"> <span>Old site</span>
+                    <mat-icon>arrow_outward</mat-icon></a>
+                <a mat-stroked-button href="https://github.com/11null/status/tree/src-main" target="_blank" matTooltip="GitHub repo"> <span>GitHub repo</span>
+                    <mat-icon>html</mat-icon></a>
+                <a mat-stroked-button href="https://discord.com/channels/951981656301006878/1114311652872036382" target="_blank" matTooltip="Discord"> <span>Discord</span>
+                    <mat-icon>chat</mat-icon></a>
+                <a mat-stroked-button href="https://github.com/11null/status/issues" target="_blank" matTooltip="Report a problem"> <span>Report a problem</span>
+                    <mat-icon>bug_report</mat-icon></a>
+                <a mat-stroked-button href="https://discord.com/users/800897818520715314" target="_blank" matTooltip="Support"> <span> Support</span>
+                    <mat-icon>contact_support</mat-icon></a>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>
+
